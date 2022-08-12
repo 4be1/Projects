@@ -19,7 +19,7 @@ return headers
 def create_url(keyword, start_date, end_date, max_results = 10):
     
     # you can change this do a diffrent endpoint 
-    search_url = "https://api.twitter.com/2/tweets/search/recent"
+    search_url = "SITE URL"
     
     
     
@@ -29,8 +29,7 @@ def create_url(keyword, start_date, end_date, max_results = 10):
                 'start_time': start_date,
                 'end_time': end_date,
                 'max_results': max_results,
-                'expansions': 'author_id,in_reply_to_user_id,geo.place_id,referenced_tweets.id',
-                'tweet.fields': 'id,author_id,created_at,public_metrics,source',
+                'expansions': 'author_id,in_reply_to_user_id,geo.place_id'
                  'place.fields': 'full_name,id,country,country_code,geo,name,place_type',
                  'next_token':{}}
     return (search_url,query_params)
@@ -49,7 +48,7 @@ headers = create_headers(bearer_token)
 keyword = "CES lang:en"
 start_time = "2022-01-08T00:00:00.000Z"
 end_time = "2022-01-09T08:59:00.000Z"
-# plus one day and 8:50 = 11:50pm (for most recent tweets)
+# plus one day and 8:50 = 11:50pm (for most recent)
 
 
 url = create_url(keyword,start_time,end_time,max_results)
@@ -71,12 +70,12 @@ max_results = 15
 
 #Take JSON response, select fields and place into DataFrame
 
-tweet_list = []
+t_list = []
 for t in json_response['data']:
-    tweet_list.append([t['id'],t['author_id'],t['text']])
+    t_list.append([t['id'],t['author_id'],t['text']])
 
 
-tweet_list = pd.DataFrame(tweet_list)
+t_list = pd.DataFrame(t_list)
 
 
 metrics_list = []
@@ -95,7 +94,7 @@ metrics_list = pd.DataFrame(metrics_list)
 
 #Take DataFrames, transform and concat to form table
 
-table = pd.concat([tweet_list,metrics_list],axis=1)
+table = pd.concat([t_list,metrics_list],axis=1)
 table = table.rename(columns={0:"id",1:"author_id",2:"text"})
 #table
 
@@ -111,8 +110,8 @@ from sqlalchemy import *
 db = pymysql.connect(host = 'HOST',user = 'USER',password = 'PASSWORD')
 cursor = db.cursor()
 
-cursor.execute('CREATE DATABASE twitter')
+cursor.execute('CREATE DATABASE twit')
 
-table.to_sql('twitter',con=cursor)
+table.to_sql('twit',con=cursor)
 
 
